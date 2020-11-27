@@ -1,16 +1,18 @@
 package com.example.myapplication
 
 import android.Manifest
+
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.*
+import androidx.lifecycle.Transformations.map
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -29,8 +31,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
+
         initControls()
     }
 
@@ -39,10 +40,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         if (!checkPermissions()) {
             requestPermissions()
         } else {
-
+            initMap()
         }
 
+    }
 
+    override fun onResume() {
+        super.onResume()
+        initMap()
+    }
+
+    private fun initMap() {
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
     }
 
     private fun checkPermissions(): Boolean {
@@ -91,7 +101,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Log.i(TAG, "User interaction was cancelled.")
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-
+                initMap()
             } else {
 
 
@@ -99,10 +109,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
-
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap?) {
+
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
