@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     lateinit var placesClient: PlacesClient
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var ivSearch: LinearLayout
+    private lateinit var tvSerchText: TextView
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     var mMarker: Marker? = null
@@ -55,6 +57,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun initControls() {
 
         ivSearch = findViewById(R.id.ivSearch)
+        tvSerchText = findViewById(R.id.tvSerchText)
         ivSearch.setOnClickListener {
             onSearchCalled()
         }
@@ -163,7 +166,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun onSearchCalled() {
-        ivSearch.visibility = View.GONE
+
         val apiKey = "AIzaSyDFjbzwtDSTsbCKwwjcSakbWjmM6I6nIhw"
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, apiKey)
@@ -195,14 +198,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         mMarker = mMap!!.addMarker(
                             MarkerOptions()
                                 .position(place.latLng!!)
-                                .title("currentLocation")
+                                .title(place.name)
                         )
                         mMap?.animateCamera(
                             CameraUpdateFactory.newLatLngZoom(place.latLng, 15f)
 
                         )
+                        tvSerchText.text = place.name
                     }
-                    ivSearch.visibility = View.VISIBLE
+
 
                 }
                 AutocompleteActivity.RESULT_ERROR -> {
