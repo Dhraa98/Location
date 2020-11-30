@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Location</string>
     <string name="google_maps_key">AIzaSyBCbTKAhr6-2tfQDtVLbd40GvKLeedJn7Q</string>
+    <string name="google_autocomplete_key">AIzaSyDFjbzwtDSTsbCKwwjcSakbWjmM6I6nIhw</string>
     <string name="msg_location_empty">location is null</string>
 </resources>
