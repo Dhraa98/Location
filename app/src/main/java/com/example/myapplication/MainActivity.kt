@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.ui.MainActivityViewModel
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private val AUTOCOMPLETE_REQUEST_CODE = 1
     lateinit var placesClient: PlacesClient
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     var mMarker: Marker? = null
@@ -69,16 +71,41 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             onSearchCalled()
         }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-
-        if (!checkPermissions()) {
-            requestPermissions()
-        } else {
-            initMap()
+        if (ContextCompat.checkSelfPermission(this@MainActivity,
+                Manifest.permission.ACCESS_FINE_LOCATION) !==
+            PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(this@MainActivity,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            } else {
+                ActivityCompat.requestPermissions(this@MainActivity,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            }
         }
+
+
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
+        when (requestCode) {
+            1 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] ==
+                    PackageManager.PERMISSION_GRANTED) {
+                    if ((ContextCompat.checkSelfPermission(this@MainActivity,
+                            Manifest.permission.ACCESS_FINE_LOCATION) ===
+                                PackageManager.PERMISSION_GRANTED)) {
 
+                        initMap()
+                    }
+                } else {
+
+                }
+                return
+            }
+        }
+    }
     private fun initMap() {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
@@ -86,59 +113,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun checkPermissions(): Boolean {
-        val permissionState = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-        return permissionState == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun startLocationPermissionRequest() {
-        ActivityCompat.requestPermissions(
-            this@MainActivity,
-            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-            REQUEST_PERMISSIONS_REQUEST_CODE
-        )
-    }
-
-    private fun requestPermissions() {
-        val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-
-
-        if (shouldProvideRationale) {
-            Log.i(TAG, "Displaying permission rationale to provide additional context.")
-
-
-        } else {
-            Log.i(TAG, "Requesting permission")
-
-            startLocationPermissionRequest()
-        }
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        Log.i(TAG, "onRequestPermissionResult")
-        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.size <= 0) {
-
-                Log.i(TAG, "User interaction was cancelled.")
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                initMap()
-            } else {
-
-
-            }
-        }
-    }
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap?) {
@@ -294,35 +268,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    /* private fun setAddress(latitude: Double, longitude: Double) {
-         val geocoder: Geocoder
-         var addresses: List<Address>? = null
-         geocoder = Geocoder(this, Locale.getDefault())
-         try {
-             addresses = geocoder.getFromLocation(
-                 latitude,
-                 longitude,
-                 1
-             ) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-         } catch (e: IOException) {
-             e.printStackTrace()
-         }
-         if (addresses!!.size > 0) {
-             Log.d("max", " " + addresses[0].maxAddressLineIndex)
-             val address = addresses[0]
-                 .getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-             val city = addresses[0].locality
-             val state = addresses[0].adminArea
-             val country = addresses[0].countryName
-             val postalCode = addresses[0].postalCode
-             val knownName =
-                 addresses[0].featureName // Only if available else return NULL
-             addresses[0].adminArea
 
-
-             tvSerchText.text = city
-
-         }
-
-     }*/
 }
