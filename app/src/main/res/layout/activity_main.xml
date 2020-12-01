@@ -1,42 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <data>
+<variable
+    name="viewmodel"
+    type="com.example.myapplication.ui.MainActivityViewModel" />
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity" />
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/ivSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:padding="5dp"
-        android:orientation="horizontal"
-        android:background="@android:color/white">
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity" />
 
-        <ImageView
-            android:padding="2dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_search_24" />
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvSerchText"
-            android:hint="Search Location"
-            android:textColor="@android:color/black"
-            android:gravity="center_vertical"
-            android:textStyle="bold"
-            android:textSize="20dp"
-            android:layout_marginLeft="10dp"
+        <LinearLayout
+            android:id="@+id/ivSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:singleLine="true"/>
-    </LinearLayout>
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:orientation="horizontal"
+            android:background="@android:color/white">
 
-</RelativeLayout>
+            <ImageView
+                android:padding="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_search_24" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tvSerchText"
+                android:hint="Search Location"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                android:text="@{viewmodel.searchText}"
+                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

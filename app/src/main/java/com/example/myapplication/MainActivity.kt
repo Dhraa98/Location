@@ -16,8 +16,12 @@ import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
+import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.myapplication.ui.MainActivityViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
@@ -28,6 +32,7 @@ import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 import java.util.*
 
@@ -38,28 +43,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private val AUTOCOMPLETE_REQUEST_CODE = 1
     lateinit var placesClient: PlacesClient
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var ivSearch: LinearLayout
-    private lateinit var tvSerchText: TextView
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     var mMarker: Marker? = null
-     var mMarkerLocation: Marker? = null
+    var mMarkerLocation: Marker? = null
     lateinit var mMap: GoogleMap
     var markerList: MutableList<Marker> =
         mutableListOf()
-
+    private lateinit var binding: ActivityMainBinding
+    val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         initControls()
     }
 
     private fun initControls() {
+        binding.lifecycleOwner = this
 
-        ivSearch = findViewById(R.id.ivSearch)
-        tvSerchText = findViewById(R.id.tvSerchText)
+        binding.viewmodel = viewModel
+
         ivSearch.setOnClickListener {
             onSearchCalled()
         }
@@ -156,14 +161,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         val markerIcon =
                             getMarkerIconFromDrawable(circleDrawable)
 
-                        val geocoder = Geocoder(this@MainActivity, Locale.getDefault())
 
-                        setAddress(location.latitude, location.longitude)
+
+                        viewModel.setAddress(location.latitude, location.longitude)
 
                         mMarker = googleMap.addMarker(
                             MarkerOptions()
                                 .position(currentLocation)
-                                .title(tvSerchText.text.toString())
+                                .title(viewModel.searchText.value)
                                 .icon(
                                     markerIcon
                                 )
@@ -229,7 +234,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         if (mMarkerLocation != null) {
                             mMarkerLocation!!.remove()
-                            mMarkerLocation=null
+                            mMarkerLocation = null
 
 
                         }
@@ -289,35 +294,35 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun setAddress(latitude: Double, longitude: Double) {
-        val geocoder: Geocoder
-        var addresses: List<Address>? = null
-        geocoder = Geocoder(this, Locale.getDefault())
-        try {
-            addresses = geocoder.getFromLocation(
-                latitude,
-                longitude,
-                1
-            ) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        if (addresses!!.size > 0) {
-            Log.d("max", " " + addresses[0].maxAddressLineIndex)
-            val address = addresses[0]
-                .getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-            val city = addresses[0].locality
-            val state = addresses[0].adminArea
-            val country = addresses[0].countryName
-            val postalCode = addresses[0].postalCode
-            val knownName =
-                addresses[0].featureName // Only if available else return NULL
-            addresses[0].adminArea
+    /* private fun setAddress(latitude: Double, longitude: Double) {
+         val geocoder: Geocoder
+         var addresses: List<Address>? = null
+         geocoder = Geocoder(this, Locale.getDefault())
+         try {
+             addresses = geocoder.getFromLocation(
+                 latitude,
+                 longitude,
+                 1
+             ) // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+         } catch (e: IOException) {
+             e.printStackTrace()
+         }
+         if (addresses!!.size > 0) {
+             Log.d("max", " " + addresses[0].maxAddressLineIndex)
+             val address = addresses[0]
+                 .getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+             val city = addresses[0].locality
+             val state = addresses[0].adminArea
+             val country = addresses[0].countryName
+             val postalCode = addresses[0].postalCode
+             val knownName =
+                 addresses[0].featureName // Only if available else return NULL
+             addresses[0].adminArea
 
 
-            tvSerchText.text = city
+             tvSerchText.text = city
 
-        }
+         }
 
-    }
+     }*/
 }
